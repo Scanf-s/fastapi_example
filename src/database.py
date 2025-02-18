@@ -1,8 +1,9 @@
 from sqlmodel import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlmodel import SQLModel
-
 from src.user.models import User
+from src.token.models import Token
+
 
 class Database:
     _engine: Engine = None

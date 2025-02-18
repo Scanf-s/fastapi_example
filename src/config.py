@@ -13,3 +13,4 @@ class Config(BaseSettings):
 
     DEV_MODE: bool = Field()
     DATABASE_URL: str = Field()
+    BASE_API_URI: str = Field()
