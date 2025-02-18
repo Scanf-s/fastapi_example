@@ -1,0 +1,2 @@
+class CannotFoundObject(Exception):
+    pass
