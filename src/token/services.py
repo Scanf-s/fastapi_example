@@ -55,7 +55,7 @@ class TokenService:
 
         # JWT Payload 구조 설정
         payload: Dict[str, Any] = {
-            "user_id": user_id,
+            "user_id": str(user_id),
             "iat": current_time,
             "exp": expire_time
         }
