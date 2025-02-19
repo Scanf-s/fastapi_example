@@ -26,11 +26,11 @@ class TokenService:
             if _user is None:
                 raise CannotFoundObject("Cannot found user while saving refresh token")
 
-            statement = select(Token).where(Token.user == _user)
+            statement = select(Token).where(Token.user_id == _user.user_id)
             _token: Optional[Token] = session.exec(statement).first()
 
             if _token is None:
-                _token = Token(user=_user, token=token, type=TokenType.REFRESH)
+                _token = Token(user_id=_user.user_id, token=token, type=TokenType.REFRESH)
             else:
                 _token.token = token
 

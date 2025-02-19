@@ -8,7 +8,7 @@ class TokenType(str, Enum):
     REFRESH = "refresh"
 
 class Token(SQLModel, table=True):
-    token_id: Optional[int] = Field(default=None, primary_key=True)
+    token_id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: Optional[uuid.UUID] = Field(default=None, foreign_key="user.user_id", index=True, unique=True)
     token: str = Field(index=True)
     type: TokenType = Field(default=TokenType.REFRESH)

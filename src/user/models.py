@@ -8,7 +8,7 @@ class UserRole(str, Enum):
     ADMIN = "admin"
 
 class User(SQLModel, table=True):
-    user_id: Optional[uuid.UUID] = Field(default=None, primary_key=True, index=True)
+    user_id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
     email: str
     password: str
     is_active: bool
