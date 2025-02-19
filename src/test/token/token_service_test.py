@@ -2,7 +2,6 @@ from typing import Optional
 
 from sqlmodel import Session, select, create_engine, SQLModel
 from fastapi.testclient import TestClient
-from fastapi import Depends
 
 from src.main import app
 from src.user.models import User

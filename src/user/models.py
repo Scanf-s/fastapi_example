@@ -9,8 +9,8 @@ class UserRole(str, Enum):
 
 class User(SQLModel, table=True):
     user_id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
-    email: str
-    password: str
+    email: str = Field(unique=True)
+    hashed_password: str = Field(min_length=8)
     is_active: bool
     role: UserRole = Field(default=UserRole.USER)
     

@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 from sqlmodel import Session, select
 import jwt
+from jwt.exceptions import InvalidTokenError, DecodeError
 import uuid
 from src.token.models import Token, TokenType
 from src.user.models import User
@@ -68,3 +69,12 @@ class TokenService:
             self.save_refresh_token(user_id=user_id, token=token)
 
         return token
+
+    def validate_token(self, token: str) -> bool:
+        try:
+            jwt.decode(token, fastapi_settings.JWT_SECRET, algorithm=fastapi_settings.JWT_ALGORITHM)
+            return True
+        except (InvalidTokenError, DecodeError) as e:
+            return False
+
+
