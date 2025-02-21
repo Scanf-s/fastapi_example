@@ -1,9 +1,9 @@
 from fastapi.routing import APIRouter
 
 router = APIRouter(
-    prefix="/user"
+    prefix="/users"
 )
 
-@router.post("/")
-async def signup():
+@router.get("")
+async def get_users():
     pass
