@@ -5,10 +5,10 @@ from fastapi.routing import APIRouter
 from fastapi import status, Depends, Response, HTTPException
 from fastapi.responses import JSONResponse
 
-from src.token.models import TokenType
-from src.token.schemas.token_refresh_dto import TokenRefreshDTO
-from src.token.schemas.validate_token_request_body import ValidateTokenRequestBody
-from src.token.services import TokenService
+from jwt_token.models import TokenType
+from jwt_token.schemas.token_refresh_dto import TokenRefreshDTO
+from jwt_token.schemas.validate_token_request_body import ValidateTokenRequestBody
+from jwt_token.services import TokenService
 
 router = APIRouter(
     prefix="/token"
