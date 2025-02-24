@@ -1,5 +1,6 @@
 from typing import Optional
 
+import pytest
 from sqlmodel import select
 from config.settings import config
 from user.models import User
@@ -8,7 +9,8 @@ from jwt_token.services import TokenService
 from test.conftest import database_session          # 테스트 전용 데이터베이스 Pytest fixture
 
 
-def test_save_token(database_session):
+@pytest.mark.asyncio
+async def test_save_token(database_session):
     # 테스트 사용자 생성 및 저장
     temp_user: User = User(
         email="test@test.com",
@@ -21,7 +23,7 @@ def test_save_token(database_session):
     database_session.refresh(temp_user)
 
     # TokenService의 save_refresh_token 호출
-    TokenService.save_refresh_token(user_id=temp_user.user_id, token="test", database_session=database_session)
+    await TokenService.save_refresh_token(user_id=temp_user.user_id, token="test", database_session=database_session)
 
     # 저장된 토큰 조회
     statement = select(Token).where(Token.user_id == temp_user.user_id)
@@ -30,7 +32,9 @@ def test_save_token(database_session):
     assert saved_token is not None, "Token is not saved"
     assert saved_token.token == "test", "Invalid token data"
 
-def test_create_token(database_session):
+
+@pytest.mark.asyncio
+async def test_create_token(database_session):
     # 테스트 사용자 생성 및 저장
     temp_user: User = User(
         email="test@test.com",
@@ -44,7 +48,7 @@ def test_create_token(database_session):
 
     # ACCESS TOKEN 생성 -> TokenService의 create_token 호출
     token_service: TokenService = TokenService()
-    access_token: str = token_service.create_token(
+    access_token: str = await token_service.create_token(
         user_id=temp_user.user_id,
         token_type=TokenType.ACCESS,
         fastapi_config=config,
@@ -61,7 +65,7 @@ def test_create_token(database_session):
     assert access_token != "", "Invalid access token"
 
     # REFRESH TOKEN 생성 -> TokenService의 create_token 호출
-    refresh_token: str = token_service.create_token(
+    refresh_token: str = await token_service.create_token(
         user_id=temp_user.user_id,
         token_type=TokenType.REFRESH,
         fastapi_config=config,
