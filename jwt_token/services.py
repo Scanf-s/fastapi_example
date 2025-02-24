@@ -16,7 +16,7 @@ from config.exceptions import CannotFoundObject
 class TokenService:
 
     @staticmethod
-    def save_refresh_token(user_id: uuid.UUID, token: str, database_session: Session = None):
+    async def save_refresh_token(user_id: uuid.UUID, token: str, database_session: Session = None):
         """
         Refresh token 저장 함수
 
@@ -43,7 +43,7 @@ class TokenService:
         database_session.commit()
         logger.debug("Refresh token saved")
 
-    def create_token(
+    async def create_token(
             self,
             user_id: uuid.UUID,
             token_type: str,
@@ -76,12 +76,12 @@ class TokenService:
             payload, fastapi_config.JWT_SECRET, algorithm=fastapi_config.JWT_ALGORITHM
         )
         if token_type == TokenType.REFRESH:
-            self.save_refresh_token(user_id=user_id, token=token, database_session=database_session)
+            await self.save_refresh_token(user_id=user_id, token=token, database_session=database_session)
 
         return token
 
     @staticmethod
-    def validate_token(token: str, fastapi_config: Config = Annotated[Config, Depends(get_fastapi_config)]) -> bool:
+    async def validate_token(token: str, fastapi_config: Config = Annotated[Config, Depends(get_fastapi_config)]) -> bool:
         try:
             jwt.decode(token, fastapi_config.JWT_SECRET, algorithm=fastapi_config.JWT_ALGORITHM)
             return True
