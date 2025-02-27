@@ -1,8 +1,8 @@
 from fastapi.routing import APIRouter
 from fastapi import Depends
 from typing import Annotated
-from user.schemas.sign_up_dto import SignUpDTO
-from user.services.user_services import UserService
+from user.schemas.signup import SignUpDTO
+from user.services.user_services import get_user_service, UserService
 from fastapi.responses import JSONResponse
 from fastapi import status
 
@@ -10,10 +10,6 @@ from fastapi import status
 router = APIRouter(
     prefix="/user"
 )
-
-user_service_instance = UserService()
-async def get_user_service() -> UserService:
-    return user_service_instance
 
 @router.post("")
 async def signup(

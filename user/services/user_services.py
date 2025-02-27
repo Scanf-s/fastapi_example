@@ -2,23 +2,20 @@ from typing import Annotated, Dict, Optional
 from fastapi import Depends
 
 from config.exceptions import UserAlreadyExists
-from user.schemas.sign_up_dto import SignUpDTO
 from user.models import User
 from sqlmodel import Session, select
 from passlib.context import CryptContext
 from config.dependencies import get_database_session
+from user.dependencies import user_dependencies
 from fastapi import logger
 
-
-async def get_password_context():
-    return CryptContext(schemes=["md5_crypt"], deprecated="auto")
 
 class UserService:
 
     async def create_user(
             self,
             register_data: Dict,
-            password_context: CryptContext = Annotated[CryptContext, Depends(get_password_context)],
+            password_context: CryptContext = Annotated[CryptContext, Depends(user_dependencies.get_password_context)],
             database_session: Session = Annotated[Session, Depends(get_database_session)]
     ):
         """
