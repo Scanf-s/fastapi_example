@@ -5,7 +5,7 @@ from typing import Annotated, Optional
 from config.dependencies import get_database_session
 from user.services.user_services import UserService, get_user_service
 from user.models import User
-from config.exceptions import CannotFoundObject
+from config.exceptions import ObjectNotFound
 from passlib.context import CryptContext
 from user.dependencies import get_password_context
 
@@ -25,11 +25,11 @@ class AuthService:
         statement = select(User).where(User.email == email)
         _user: Optional[User] = database_session.exec(statement).first()
         if _user is None:
-            raise CannotFoundObject("User not found")
+            raise ObjectNotFound("User not found")
         
         await user_service.password_validate(password=password)
         if not await user_service.password_verify(plain_password=password, hashed_password=_user.hashed_password, password_context=password_context):
-            raise CannotFoundObject("Password is incorrect")
+            raise ObjectNotFound("Password is incorrect")
 
     async def logout(self, token: str):
         pass

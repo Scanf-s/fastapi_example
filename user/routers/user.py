@@ -1,8 +1,9 @@
 from fastapi.routing import APIRouter
 from fastapi import Depends
 from typing import Annotated
-from user.schemas.signup import SignUpDTO
-from user.services.user_services import get_user_service, UserService
+from user.schemas.signup import SignUp
+from user.services.user_services import UserService
+from user.dependencies import user_dependencies
 from fastapi.responses import JSONResponse
 from fastapi import status
 
@@ -13,8 +14,8 @@ router = APIRouter(
 
 @router.post("")
 async def signup(
-        register_data: SignUpDTO,
-        user_service: UserService = Annotated[UserService, Depends(get_user_service)]
+        register_data: SignUp,
+        user_service: UserService = Annotated[UserService, Depends(user_dependencies.get_user_service)]
 ):
     await user_service.create_user(register_data=register_data.model_dump())
     return JSONResponse(

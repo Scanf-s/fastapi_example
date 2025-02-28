@@ -1,5 +1,5 @@
-# src/main.py
 from fastapi import FastAPI
+from config.exceptions import register_exception_handlers
 from sqlmodel import SQLModel
 
 from config.settings import config
@@ -20,6 +20,9 @@ def create_app() -> FastAPI:
         redoc_url=None,
         openapi_url=None,
     )
+
+    # Register Exception Handlers
+    register_exception_handlers(fastapi)
 
     # Register API Routers
     fastapi.include_router(token_router, prefix=config.BASE_API_URI, tags=["token"])

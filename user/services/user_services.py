@@ -33,8 +33,8 @@ class UserService:
         if _user is not None:
             raise UserAlreadyExists("User already exists that using this email")
 
-        valid_user: User = User(email=email, hashed_password=hashed_password, is_active=True, role="user")
-        database_session.add(valid_user)
+        new_user: User = User(email=email, hashed_password=hashed_password, is_active=True, role="user")
+        database_session.add(new_user)
         database_session.commit()
         logger.debug("Successfully created user")
 
