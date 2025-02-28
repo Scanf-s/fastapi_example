@@ -1,13 +1,10 @@
-from typing import Annotated, Dict, Optional
-from fastapi import Depends
+from typing import Dict, Optional
 
 from config.exceptions import UserAlreadyExists
 from user.models import User
 from sqlmodel import Session, select
 from passlib.context import CryptContext
-from config.dependencies import get_database_session
-from user.dependencies import user_dependencies
-from fastapi import logger
+from fastapi.logger import logger
 
 
 class UserService:
@@ -15,9 +12,9 @@ class UserService:
     async def create_user(
             self,
             register_data: Dict,
-            password_context: CryptContext = Annotated[CryptContext, Depends(user_dependencies.get_password_context)],
-            database_session: Session = Annotated[Session, Depends(get_database_session)]
-    ):
+            password_context: CryptContext,
+            database_session: Session
+    ) -> User:
         """
         사용자 생성 시 사용하는 함수
         """
@@ -38,12 +35,15 @@ class UserService:
         database_session.commit()
         logger.debug("Successfully created user")
 
+        return new_user
+
     @staticmethod
     async def get_password_hash(plain_password: str, password_context: CryptContext) -> str:
         """
         평문 비밀번호를 Hash화 해주는 함수
         """
-        return password_context.hash(plain_password)
+        encrypted_password: str = password_context.hash(secret=plain_password)
+        return encrypted_password
 
     @staticmethod
     async def email_validate(email: str):
