@@ -1,12 +1,12 @@
 import uuid
-from typing import Dict, Annotated
+from typing import Dict, Annotated, Any
 
 from fastapi.routing import APIRouter
 from fastapi import status, Depends, Response, HTTPException
 from fastapi.responses import JSONResponse
 
 from jwt_token.models import TokenType
-from jwt_token.schemas.token_refresh_dto import TokenRefreshDTO
+from jwt_token.schemas.token_refresh_dto import TokenRefreshResponse, TokenRefreshRequest
 from jwt_token.schemas.validate_token_request_body import ValidateTokenRequestBody
 from jwt_token.services import TokenService
 
@@ -19,8 +19,11 @@ token_service_instance = TokenService()
 def get_token_service() -> TokenService:
     return token_service_instance
 
-@router.post("/refresh")
-async def refresh(token_service: TokenService = Annotated[TokenService, Depends(get_token_service)]) -> JSONResponse:
+@router.post("/refresh", response_model=TokenRefreshResponse)
+async def refresh(
+        request_body: TokenRefreshRequest,
+        token_service: TokenService = Depends(get_token_service)
+) -> Any:
     """
     만약 refresh token payload에 들어있는 사용자가 유효한 사용자라면,
     Refresh token을 사용하여 Access token 및 Refresh token 재발급 (Rotate)
@@ -29,15 +32,15 @@ async def refresh(token_service: TokenService = Annotated[TokenService, Depends(
 
     refresh_token: str = await token_service.create_token(user_id=user_id, token_type=TokenType.REFRESH)
     access_token: str = await token_service.create_token(user_id=user_id, token_type=TokenType.ACCESS)
-    return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
-        content = TokenRefreshDTO(access_token=access_token, refresh_token=refresh_token).model_dump()
-    )
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
 
 @router.post("/validate")
 async def validate_token(
         token_request: ValidateTokenRequestBody,
-        token_service: TokenService = Annotated[TokenService, Depends(get_token_service)]
+        token_service: TokenService = Depends(get_token_service)
 ) -> Response:
     """
     토큰 유효성 검증 함수

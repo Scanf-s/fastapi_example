@@ -5,11 +5,12 @@ from sqlmodel import select
 from user.models import User
 from user.dependencies import user_dependencies
 from test.conftest import database_session          # 테스트 전용 데이터베이스 Pytest fixture
-from user.schemas.signup import SignUp
+from sqlmodel import Session
 
 if TYPE_CHECKING:
     from user.services.user_services import UserService
     from passlib.context import CryptContext
+
 
 @pytest.mark.asyncio
 async def test_signup_module(database_session):
@@ -34,3 +35,26 @@ async def test_signup_module(database_session):
     assert searched_user.email == created_user.email, "created user and searched user is not same"
 
     print(searched_user.model_dump())
+
+
+@pytest.mark.asyncio
+async def test_signup_request(test_client: TestClient, database_session: Session):
+
+    # Given
+    request_data = {
+        "email": "asdf@asdf.com",
+        "password": "asdjfgaiejfo@124"
+    }
+
+    # When
+    response = test_client.post(
+        url="/api/v1/user",
+        json=request_data
+    )
+
+    # Then
+    assert response.status_code == 201
+    statement = select(User).where(User.email == request_data["email"])
+    user = database_session.exec(statement).first()
+    assert user is not None, "User is not created"
+    assert user.email == request_data["email"], "Email is not matched"
