@@ -11,7 +11,7 @@ from user.models import User
 from fastapi.logger import logger
 from fastapi import Depends
 from datetime import datetime, timedelta
-from config.exceptions import CannotFoundObject
+from config.exceptions import ObjectNotFound
 
 class TokenService:
 
@@ -27,7 +27,7 @@ class TokenService:
         statement = select(User).where(User.user_id == user_id)
         _user: Optional[User] = database_session.exec(statement).first()
         if _user is None:
-            raise CannotFoundObject("Cannot found user while saving refresh token")
+            raise ObjectNotFound("Cannot found user while saving refresh token")
 
         statement = select(Token).where(Token.user_id == _user.user_id)
         logger.debug(statement)
